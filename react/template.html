@@ -3,7 +3,9 @@
 
   <head>
     <meta charset="utf-8">
-    <title>React Counter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>React Carousel</title>
 
     <script src="../lib/react.js"></script>
     <script src="../lib/react-dom.js"></script>
@@ -17,36 +19,108 @@
     <div id="app"></div>
 
     <script type="text/babel">
-      var Counter = React.createClass({
+      function Button({ children, onClick, name, className }) {
+        return (
+          <button
+              type="button"
+              name={name}
+              className={`btn ${className}`}
+              onClick={onClick}
+            >
+              {children}
+          </button>
+        );
+      }
+    
+      function IndexIndicator({ active, onPress }) {
+        return (
+          <div
+            className={`index-indicator${active ? ' active' : ''}`}
+            onClick={onPress}
+          />
+        );
+      }
+
+      var Carousel = React.createClass({
         getInitialState() {
           return {
-            count: 0,
-            title: 'React Counter'
+            title: 'React Carousel',
+            ix: 0,
+            imgs: [
+              'https://source.unsplash.com/random/500x500?0',
+              'https://source.unsplash.com/random/500x500?1',
+              'https://source.unsplash.com/random/500x500?2',
+              'https://source.unsplash.com/random/500x500?3'
+            ]
           };
         },
         increment() {
-          this.setState({count: this.state.count + 1});
+          if (this.state.ix < this.state.imgs.length - 1) {
+            this.changeIndex(this.state.ix + 1);
+          } else {
+            this.changeIndex(0);
+          }
         },
         decrement() {
-          if (this.state.count > 0) this.setState({count: this.state.count - 1});
+          if (this.state.ix > 0) {
+            this.changeIndex(this.state.ix - 1);
+          } else {
+            this.changeIndex(this.state.imgs.length - 1);
+          }
+        },
+        changeIndex(ix) {
+          this.setState({ ix });
         },
         render() {
+          const { title, imgs, ix } = this.state;
           return (
             <div>
-              <h1 className="app-title">{ this.state.title }</h1>
-              <div className="app-current-count">
-                { this.state.count }
-              </div>
-              <div className="app-counter-buttons">
-                <button type="button" name="decrement" onClick={this.decrement}>-</button>
-                <button type="button" name="increment" onClick={this.increment}>+</button>
+              <h1 className="app-title">{ title }</h1>
+                <div>
+                  <div className="image-swipe-container">
+                    <Button
+                        name="decrement"
+                        className="decrement"
+                        onClick={this.decrement}
+                      >
+                        &lt;
+                    </Button>
+                    <div className="image-container">
+                      {imgs.map((img, imgIx) => (
+                        <img
+                          key={img}
+                          src={img}
+                          alt="random image"
+                          className={ix === imgIx ? 'visible' : 'hidden'}
+                        />
+                      ))}
+                    </div>
+                    <div>
+                    <Button
+                      name="increment"
+                      className="increment"
+                      onClick={this.increment}
+                    >
+                      &gt;
+                    </Button>
+                  </div>
+                </div>
+                <div className="index-container">
+                  {imgs.map((img, imgIx) => (
+                    <IndexIndicator
+                      key={img}
+                      active={ix === imgIx}
+                      onPress={() => this.changeIndex(imgIx)}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           );
         }
         });
 
-        ReactDOM.render(<Counter />, document.getElementById('app'));
+        ReactDOM.render(<Carousel />, document.getElementById('app'));
 
       </script>
 
